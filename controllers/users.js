@@ -16,14 +16,12 @@ const checkUser = (user, res) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, email, password,
   } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
-      about,
-      avatar,
       email,
       password: hash,
     }))
@@ -31,8 +29,6 @@ const createUser = (req, res, next) => {
       res.status(201).send({
         data: {
           name: user.name,
-          about: user.about,
-          avatar: user.avatar,
           email: user.email,
         },
       });
@@ -81,11 +77,11 @@ const getUserById = (req, res, next) => {
 };
 
 const updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
   User
     .findByIdAndUpdate(
       req.user._id,
-      { name, about },
+      { name, email },
       { new: true, runValidators: true },
     )
     .then((user) => {
@@ -95,22 +91,6 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(BadRequestError('Ошибка: переданы некорректные данные'));
-      } else next(err);
-    });
-};
-
-const changeAvatar = (req, res, next) => {
-  const { avatar } = req.body;
-  User
-    .findByIdAndUpdate(
-      req.user._id,
-      { avatar },
-      { new: true, runValidators: true },
-    )
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new BadRequestError('Ошибка: переданы некорректные данные'));
       } else next(err);
     });
 };
@@ -143,8 +123,13 @@ const login = (req, res, next) => {
         {
           expiresIn: '7d',
         },
-      );
-      return res.send({ token });
+      ); res
+        .cookie('jwt', token, {
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: 'None',
+          secure: true,
+        }).send({ message: 'Авторизация прошла успешно' });
     })
     .catch(next);
 };
@@ -160,7 +145,6 @@ module.exports = {
   getUsers,
   getUserById,
   updateUser,
-  changeAvatar,
   getCurrentUser,
   getMe,
 };

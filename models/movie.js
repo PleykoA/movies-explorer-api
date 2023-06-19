@@ -1,18 +1,48 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const cardSchema = mongoose.Schema({
-  name: {
+const movieSchema = mongoose.Schema({
+  country: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
     required: true,
   },
-  link: {
+  director: {
+    type: String,
+    required: true,
+  },
+  duration: {
+    type: Number,
+    required: true,
+  },
+  year: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  image: {
     type: String,
     required: true,
     validate: {
-      validator: (url) => validator.isURL(url),
+      validator: (v) => validator.isURL(v),
+      message: 'Ошибка: неверный формат ссылки',
+    },
+  },
+  trailerLink: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: 'Ошибка: неверный формат ссылки',
+    },
+  },
+  thumbnail: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (v) => validator.isURL(v),
       message: 'Ошибка: неверный формат ссылки',
     },
   },
@@ -21,17 +51,18 @@ const cardSchema = mongoose.Schema({
     ref: 'user',
     required: true,
   },
-  likes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-      default: [],
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  movieId: {
+    type: Number,
+    required: true,
+  },
+  nameRU: {
+    type: String,
+    required: true,
+  },
+  nameEN: {
+    type: String,
+    required: true,
   },
 });
 
-module.exports = mongoose.model('card', cardSchema);
+module.exports = mongoose.model('movie', movieSchema);

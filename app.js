@@ -41,7 +41,7 @@ app.use(error);
 async function connect() {
   try {
     await mongoose.set('strictQuery', false);
-    await mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+    await mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     }).then(() => {

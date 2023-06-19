@@ -1,20 +1,45 @@
-const Card = require('../models/card');
+const Movie = require('../models/movie');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const BadRequestError = require('../errors/BadRequestError');
 
-const getCards = (req, res, next) => {
-  Card.find({})
-    .then((cards) => res.status(200).send(cards))
+const getMovies = (req, res, next) => {
+  Movie.find({})
+    .then((movies) => res.status(200).send(movies))
     .catch(next);
 };
 
-const createCard = (req, res, next) => {
-  const { name, link } = req.body;
+const createMovie = (req, res, next) => {
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
   const owner = req.user._id;
-  Card
-    .create({ name, link, owner })
-    .then((card) => res.status(201).send(card))
+  Movie
+    .create({
+      country,
+      director,
+      duration,
+      year,
+      description,
+      image,
+      trailerLink,
+      thumbnail,
+      movieId,
+      nameRU,
+      nameEN,
+      owner,
+    })
+    .then((movie) => res.status(201).send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Ошибка'));
@@ -24,16 +49,16 @@ const createCard = (req, res, next) => {
     });
 };
 
-const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
+const deleteMovie = (req, res, next) => {
+  const { movieId } = req.params;
 
-  Card.findById(cardId)
+  Movie.findById(movieId)
     .orFail(() => {
       throw new NotFoundError('Ошибка: карточка не найдена');
     })
-    .then((card) => {
-      if (card.owner.toString() === req.user._id) {
-        Card.findByIdAndRemove(cardId).then(() => res.send(card));
+    .then((movie) => {
+      if (movie.owner.toString() === req.user._id) {
+        Movie.findByIdAndRemove(movieId).then(() => res.send(movie));
       } else {
         throw new ForbiddenError('Ошибка: нельзя удалять чужие карточки');
       }
@@ -49,49 +74,8 @@ const deleteCard = (req, res, next) => {
     });
 };
 
-const likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Ошибка: пользователь не найден');
-      }
-      res.send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Ошибка: некорректные данные для постановки лайка'));
-      }
-      return next(err);
-    });
-};
-
-const removeLikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Ошибка: пользователь не найден');
-      }
-      res.send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestError('Ошибка: некорректные данные для постановки лайка'));
-      }
-      return next(err);
-    });
-};
 module.exports = {
-  getCards,
-  createCard,
-  deleteCard,
-  likeCard,
-  removeLikeCard,
+  getMovies,
+  createMovie,
+  deleteMovie,
 };

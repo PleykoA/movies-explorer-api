@@ -1,11 +1,10 @@
 const router = require('express').Router();
-const usersRouter = require('./users');
-const cardsRouter = require('./cards');
+const userRoutes = require('./users');
+const movieRoutes = require('./movie');
 const NotFoundError = require('../errors/NotFoundError');
 
-router.use('/users', usersRouter);
-router.use('/cards', cardsRouter);
-
+router.use('/users', userRoutes);
+router.use('/movies', movieRoutes);
 router.use(() => {
   throw new NotFoundError('Ошибка: страница не существует');
 });

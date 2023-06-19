@@ -1,15 +1,15 @@
 const { celebrate, Joi } = require('celebrate');
-const isUrl = require('validator/lib/isURL');
+/* const isUrl = require('validator/lib/isURL'); */
 const BadRequest = require('../errors/BadRequestError');
-
-const validationUrl = (url) => {
+const { RegExp } = require('../utils/utils');
+/* const validationUrl = (url) => {
   const validate = isUrl(url);
   if (validate) {
     return url;
   }
   throw new BadRequest('Ошибка: некорректный URL');
 };
-
+ */
 const validationID = (id) => {
   Joi.string().length(24).hex().required();
   if (/^[0-9a-fA-F]{24}$/.test(id)) {
@@ -28,8 +28,6 @@ const validationLogin = celebrate({
 const validationCreateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(validationUrl),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -42,36 +40,87 @@ const validationUpdateUser = celebrate({
   }),
 });
 
-const validationUpdateAvatar = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().required().custom(validationUrl),
-  }),
-});
-
 const validationUserId = celebrate({
   params: Joi.object().keys({
     userId: Joi.string().required().custom(validationID),
   }),
 });
 
-const validationCreateCard = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required().custom(validationUrl),
+const validationCreateMovie = celebrate({
+  body: Joi.object({
+    country: Joi.string()
+      .messages({
+        'any.required': 'Поле "страна" должно быть заполнено',
+      })
+      .required(),
+    director: Joi.string()
+      .messages({
+        'any.required': 'Поле "режиссер" должно быть заполнено',
+      })
+      .required(),
+    duration: Joi.number()
+      .messages({
+        'any.required': 'Поле "продолжительность" должно быть заполнено',
+      })
+      .required(),
+    year: Joi.string()
+      .messages({
+        'any.required': 'Поле "год" должно быть заполнено',
+      })
+      .required(),
+    description: Joi.string()
+      .messages({
+        'any.required': 'Поле "описание" должно быть заполнено',
+      })
+      .required(),
+    image: Joi.string()
+      .regex(RegExp)
+      .messages({
+        'string.dataUri': 'Некорректная ссылка',
+        'any.required': 'Поле "ссылка" должно быть заполнено',
+      })
+      .required(),
+    trailerLink: Joi.string()
+      .regex(RegExp)
+      .messages({
+        'string.dataUri': 'Некорректная ссылка',
+      })
+      .required(),
+    thumbnail: Joi.string()
+      .regex(RegExp)
+      .messages({
+        'string.dataUri': 'Некорректная ссылка',
+      })
+      .required(),
+    nameRU: Joi.string()
+      .messages({
+        'any.required': 'Поле "название" должно быть заполнено',
+      })
+      .required(),
+    nameEN: Joi.string()
+      .messages({
+        'any.required': 'Поле "навзвание" должно быть заполнено',
+      })
+      .required(),
+    movieId: Joi.number()
+      .messages({
+        'any.required': 'Поле "id" должно быть заполнено',
+      })
+      .required(),
   }),
 });
 
-const validationCardById = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().custom(validationID),
+const validationDeleteMovie = celebrate({
+  params: Joi.object({
+    _id: Joi.string().hex().length(24)
+      .required(),
   }),
 });
 
 module.exports = {
-  validationCardById,
-  validationCreateCard,
+  validationDeleteMovie,
+  validationCreateMovie,
   validationUserId,
-  validationUpdateAvatar,
   validationUpdateUser,
   validationCreateUser,
   validationLogin,
