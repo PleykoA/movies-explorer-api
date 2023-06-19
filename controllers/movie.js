@@ -54,20 +54,20 @@ const deleteMovie = (req, res, next) => {
 
   Movie.findById(movieId)
     .orFail(() => {
-      throw new NotFoundError('Ошибка: карточка не найдена');
+      throw new NotFoundError('Ошибка: фильм не найден');
     })
     .then((movie) => {
       if (movie.owner.toString() === req.user._id) {
         Movie.findByIdAndRemove(movieId).then(() => res.send(movie));
       } else {
-        throw new ForbiddenError('Ошибка: нельзя удалять чужие карточки');
+        throw new ForbiddenError('Ошибка: нельзя удалять чужие фильмы');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Ошибка'));
       } else if (err.name === 'NotFoundError') {
-        next(new NotFoundError('Ошибка: карточка не найдена'));
+        next(new NotFoundError('Ошибка: фильм не найден'));
       } else {
         next(err);
       }
