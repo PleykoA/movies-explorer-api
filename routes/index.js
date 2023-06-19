@@ -4,7 +4,7 @@ const movieRoutes = require('./movie');
 const NotFoundError = require('../errors/NotFoundError');
 
 router.use('/users', userRoutes);
-router.use('/movies', movieRoutes);
+router.use('/movie', movieRoutes);
 router.use(() => {
   throw new NotFoundError('Ошибка: страница не существует');
 });
