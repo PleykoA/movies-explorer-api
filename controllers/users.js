@@ -30,6 +30,7 @@ const createUser = (req, res, next) => {
         data: {
           name: user.name,
           email: user.email,
+          _id: user._id,
         },
       });
     })
