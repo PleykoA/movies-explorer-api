@@ -8,7 +8,7 @@
 
 IP 84.201.140.136
 
-Backend api.pleykoa-movies.nomoredomains.work
+Backend http://api.pleykoa-movies.nomoredomains.work
 
 # Используемые технологии:
 
