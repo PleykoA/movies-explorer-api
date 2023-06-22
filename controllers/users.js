@@ -30,15 +30,15 @@ const createUser = (req, res, next) => {
         data: {
           name: user.name,
           email: user.email,
-          _id: user._id,
         },
       });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(
-          'Ошибка: переданы некорректные данные',
+          'Ошибка: переданы некорректные данные 1',
         ));
+        console.log(err);
       } else if (err.code === 11000) {
         next(new ConflictError(
           'Ошибка: пользователь с таким email уже существует',
