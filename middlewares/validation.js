@@ -27,7 +27,7 @@ const validationLogin = celebrate({
 
 const validationCreateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().min(2).max(30).required(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -99,7 +99,7 @@ const validationCreateMovie = celebrate({
       .required(),
     nameEN: Joi.string()
       .messages({
-        'any.required': 'Поле "навзвание" должно быть заполнено',
+        'any.required': 'Поле "название" должно быть заполнено',
       })
       .required(),
     movieId: Joi.number()

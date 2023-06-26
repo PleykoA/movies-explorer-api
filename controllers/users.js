@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const config = require('../utils/config');
 const NotFoundError = require('../errors/NotFoundError');
 const User = require('../models/user');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-
-const { NODE_ENV, JWT_SECRET = 'dev-secret' } = process.env;
 
 const checkUser = (user, res) => {
   if (!user) {
@@ -36,7 +35,7 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(
-          'Ошибка: переданы некорректные данные 1',
+          'Ошибка: переданы некорректные данные',
         ));
         console.log(err);
       } else if (err.code === 11000) {
@@ -66,7 +65,6 @@ const getUserById = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       checkUser(user, res);
-      res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -90,9 +88,15 @@ const updateUser = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(BadRequestError('Ошибка: переданы некорректные данные'));
-      } else next(err);
+      if (err.code === 11000) {
+        next(
+          new ConflictError('Ошибка: пользователь с таким email уже зарегистрирован'),
+        );
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequestError('Ошибка: переданы некорректные данные'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -120,7 +124,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        config.JWT_SECRET,
         {
           expiresIn: '7d',
         },
@@ -130,14 +134,9 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const logout = (_, res) => {
-  res.clearCookie('jwt').send({ message: 'Выход' });
-};
-
 module.exports = {
   createUser,
   login,
-  logout,
   getUsers,
   getUserById,
   updateUser,
