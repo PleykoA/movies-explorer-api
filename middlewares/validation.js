@@ -1,16 +1,9 @@
 const { celebrate, Joi } = require('celebrate');
-/* const isUrl = require('validator/lib/isURL'); */
 const BadRequest = require('../errors/BadRequestError');
 const { RegExp } = require('../utils/utils');
-/* const validationUrl = (url) => {
-  const validate = isUrl(url);
-  if (validate) {
-    return url;
-  }
-  throw new BadRequest('Ошибка: некорректный URL');
-};
- */
+
 const validationID = (id) => {
+  console.log(id);
   Joi.string().length(24).hex().required();
   if (/^[0-9a-fA-F]{24}$/.test(id)) {
     return id;
@@ -111,8 +104,8 @@ const validationCreateMovie = celebrate({
 });
 
 const validationDeleteMovie = celebrate({
-  params: Joi.object({
-    _id: Joi.string().hex().length(24)
+  params: Joi.object().keys({
+    movieId: Joi.string().hex().length(24)
       .required(),
   }),
 });
@@ -124,4 +117,5 @@ module.exports = {
   validationUpdateUser,
   validationCreateUser,
   validationLogin,
+  validationID,
 };

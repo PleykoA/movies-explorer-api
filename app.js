@@ -11,7 +11,7 @@ const error = require('./middlewares/error');
 const connect = require('./utils/mongo');
 
 const { validationCreateUser, validationLogin } = require('./middlewares/validation');
-const { createUser, login } = require('./controllers/users');
+const { createUser, login, logout } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -29,6 +29,7 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
+app.get('/signout', logout);
 app.post('/signup', validationCreateUser, createUser);
 app.post('/signin', validationLogin, login);
 app.use(auth);

@@ -62,10 +62,17 @@ const deleteMovie = (req, res, next) => {
       throw new NotFoundError('Ошибка: фильм не найден');
     })
     .then((movie) => {
-      if (req.user._id === movie.owner._id.toString()) {
+      console.log(req.user);
+      if (req.user._id === movie.owner.toString()) {
         Movie.findByIdAndRemove(movieId)
-          .then(() => res.status(200).send(movie));
-      } throw new ForbiddenError('Ошибка: нельзя удалять чужие фильмы');
+          .then(() => res.status(200).send('Фильм удален'))
+          .catch((err) => {
+            if (err.name === 'CastError') next(new BadRequestError('Ошибка: переданы некорректные данные'));
+            else next(err);
+          });
+      } else {
+        throw new ForbiddenError('Ошибка: нельзя удалять чужие фильм');
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') next(new BadRequestError('Ошибка: переданы некорректные данные'));
