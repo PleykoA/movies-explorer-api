@@ -9,7 +9,9 @@
           "_id"
         ]
       }
-    ]
+    ],
+    "import/no-extraneous-dependencies": "off",
+    "no-console": "off"
   },
   "parserOptions": {
     "ecmaVersion": "latest"
